@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111214" />
+    <title>Book Scanner</title>
+    <meta name="description" content="Scan the pages of a book you own, read its text and study it. Everything stays on your device." />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Scanner" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <button id="back" type="button" class="back-button" aria-label="Back" hidden>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <h1 id="title">Book Scanner</h1>
+      <span id="page-count" class="count"></span>
+    </header>
+
+    <main>
+      <section id="library" class="view scroll">
+        <div class="section-header">
+          <h2>Your books</h2>
+          <button id="new-book" type="button" class="button primary">New book</button>
+        </div>
+        <input id="library-search" type="search" class="search-input" placeholder="Search all books" enterkeyhint="search" />
+        <div id="library-results" class="search-results" hidden></div>
+        <p id="library-empty" class="empty" hidden>
+          No books yet. Create one, then photograph its pages. Everything stays on this device.
+        </p>
+        <ul id="book-list" class="book-list"></ul>
+        <div id="install-card" class="install-card" hidden>
+          <p id="install-text"></p>
+          <div class="install-actions">
+            <button id="install-dismiss" type="button" class="link-button">Not now</button>
+            <button id="install-button" type="button" class="button primary" hidden>Install</button>
+          </div>
+        </div>
+        <p id="storage" class="storage"></p>
+      </section>
+
+      <section id="scanner" class="view" hidden>
+        <div class="viewfinder">
+          <video id="video" autoplay playsinline muted></video>
+          <div class="guide" aria-hidden="true"></div>
+          <div id="flash" class="flash" aria-hidden="true"></div>
+          <div id="insert-chip" class="insert-chip" hidden>
+            <span id="insert-text"></span>
+            <button id="insert-cancel" type="button" aria-label="Stop inserting, add pages at the end">&times;</button>
+          </div>
+
+          <div id="camera-message" class="camera-message" hidden>
+            <p id="camera-message-text"></p>
+            <button id="retry-camera" type="button" class="button">Try again</button>
+            <label class="button primary">
+              Take or choose photos
+              <input id="file-input" type="file" accept="image/*" capture="environment" multiple hidden />
+            </label>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="open-pages" type="button" class="thumb-button" aria-label="Show scanned pages">
+            <img id="last-thumb" alt="" hidden />
+          </button>
+          <button id="shutter" type="button" class="shutter" aria-label="Capture page" disabled></button>
+          <button id="torch" type="button" class="icon-button" aria-label="Toggle flashlight" aria-pressed="false" hidden>
+            <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+              <path d="M7 2h10v4l-3 4v12h-4V10L7 6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <section id="pages" class="view scroll" hidden>
+        <div class="book-top">
+          <input id="book-search" type="search" class="search-input" placeholder="Search this book" enterkeyhint="search" />
+          <div class="tabs" role="tablist">
+            <button type="button" role="tab" data-tab="pages" aria-selected="true">Pages</button>
+            <button type="button" role="tab" data-tab="read" aria-selected="false">Read</button>
+            <button type="button" role="tab" data-tab="notes" aria-selected="false">Highlights</button>
+          </div>
+        </div>
+        <div id="book-results" class="search-results" hidden></div>
+        <div data-panel="pages">
+        <div class="pages-actions">
+          <button id="scan" type="button" class="button primary">Scan pages</button>
+          <label class="button">
+            Add photos
+            <input id="file-input-2" type="file" accept="image/*" multiple hidden />
+          </label>
+          <button id="clean-all" type="button" class="button" hidden>Clean all</button>
+          <button id="read-all" type="button" class="button" hidden>Read all text</button>
+          <button id="export" type="button" class="button" hidden>Export</button>
+        </div>
+        <label class="language-row">
+          Text language
+          <select id="pages-language"></select>
+        </label>
+        <p id="pages-empty" class="empty">No pages yet. Tap &ldquo;Scan pages&rdquo; to photograph the first one.</p>
+        <ol id="page-grid" class="page-grid"></ol>
+        <div class="book-actions">
+          <button id="rename-book" type="button" class="button">Rename book</button>
+          <button id="delete-book" type="button" class="button danger">Delete book</button>
+        </div>
+        </div>
+        <div data-panel="read" class="reader" hidden></div>
+        <div data-panel="notes" class="notes-list" hidden></div>
+      </section>
+    </main>
+
+    <dialog id="viewer" class="viewer">
+      <img id="viewer-img" alt="" />
+      <div class="viewer-bar">
+        <div class="viewer-nav">
+          <button id="viewer-prev" type="button" class="icon-button" aria-label="Previous page">&lsaquo;</button>
+          <span id="viewer-label"></span>
+          <button id="viewer-next" type="button" class="icon-button" aria-label="Next page">&rsaquo;</button>
+          <button id="viewer-close" type="button" class="icon-button" aria-label="Close">&times;</button>
+        </div>
+        <div class="viewer-actions">
+          <button id="viewer-delete" type="button" class="button danger">Delete</button>
+          <button id="viewer-move" type="button" class="button">Move</button>
+          <button id="viewer-insert" type="button" class="button">Scan after</button>
+          <button id="viewer-text" type="button" class="button">Text</button>
+          <button id="viewer-edit" type="button" class="button primary">Edit</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="editor" class="editor">
+      <div class="editor-top">
+        <button type="button" class="button" data-action="cancel">Cancel</button>
+        <span class="editor-title">Edit page</span>
+        <button type="button" class="button primary" data-action="save">Save</button>
+      </div>
+      <div class="editor-stage">
+        <div class="editor-frame">
+          <canvas class="editor-canvas"></canvas>
+          <svg class="editor-overlay" xmlns="http://www.w3.org/2000/svg"></svg>
+          <img class="editor-preview" alt="Processed page preview" hidden />
+        </div>
+        <canvas class="loupe" hidden></canvas>
+        <p class="editor-status" role="status"></p>
+      </div>
+      <div class="editor-tools">
+        <div class="tool-row">
+          <button type="button" class="icon-button" data-action="rotate-left" aria-label="Rotate left">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M4 4v6h6M4.5 10A8 8 0 1 1 6 16.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="button" data-action="auto">Auto</button>
+          <button type="button" class="button" data-action="full">Full photo</button>
+          <button type="button" class="button" data-action="preview" aria-pressed="false">Preview</button>
+          <button type="button" class="icon-button" data-action="rotate-right" aria-label="Rotate right">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M20 4v6h-6M19.5 10A8 8 0 1 0 18 16.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="segmented" role="radiogroup" aria-label="Filter">
+          <button type="button" role="radio" data-filter="original">Original</button>
+          <button type="button" role="radio" data-filter="gray">Gray</button>
+          <button type="button" role="radio" data-filter="document">Document</button>
+        </div>
+      </div>
+    </dialog>
+
+    <div id="selection-bar" class="selection-bar" hidden></div>
+
+    <div id="update-toast" class="toast" role="status" hidden>
+      <span>A new version is ready.</span>
+      <button id="update-reload" type="button" class="button primary">Update</button>
+    </div>
+
+    <dialog id="note-dialog" class="note-dialog">
+      <h2 data-ref="title"></h2>
+      <blockquote data-ref="quote" class="note-quote"></blockquote>
+      <div data-ref="colors" class="swatches" aria-label="Color"></div>
+      <textarea data-ref="note" rows="5" placeholder="Write a note…" aria-label="Note"></textarea>
+      <div class="note-actions">
+        <button type="button" class="button danger" data-action="delete">Delete</button>
+        <span class="grow"></span>
+        <button type="button" class="button" data-action="cancel">Cancel</button>
+        <button type="button" class="button primary" data-action="save">Save</button>
+      </div>
+    </dialog>
+
+    <dialog id="text-panel" class="sheet">
+      <div class="editor-top">
+        <button type="button" class="button" data-action="close">Done</button>
+        <span class="editor-title" data-ref="title"></span>
+        <button type="button" class="button" data-action="copy">Copy</button>
+      </div>
+      <div class="text-status">
+        <span data-ref="status" role="status"></span>
+        <progress data-ref="progress" max="1" hidden></progress>
+      </div>
+      <textarea data-ref="text" class="page-text" spellcheck="true" aria-label="Page text"></textarea>
+      <div class="text-tools">
+        <select data-ref="language" aria-label="Text language"></select>
+        <button type="button" class="button primary" data-action="read">Read text</button>
+      </div>
+    </dialog>
+
+    <dialog id="export-panel" class="sheet">
+      <div class="editor-top">
+        <button type="button" class="button" data-action="close">Close</button>
+        <span class="editor-title">Export</span>
+        <span class="top-spacer"></span>
+      </div>
+      <form class="export-form" data-ref="form">
+        <fieldset>
+          <legend>Format</legend>
+          <label class="choice">
+            <input type="radio" name="format" value="pdf" checked />
+            <span><strong>PDF</strong> of the page images, to read or print</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="format" value="md" />
+            <span><strong>Markdown</strong> text (.md), for notes apps like Obsidian or Notion</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="format" value="txt" />
+            <span><strong>Plain text</strong> (.txt)</span>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Pages</legend>
+          <label class="choice">
+            <input type="radio" name="range" value="all" checked />
+            <span>All pages</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="range" value="custom" />
+            <span class="range">
+              From <input type="number" data-ref="from" min="1" inputmode="numeric" aria-label="First page" />
+              to <input type="number" data-ref="to" min="1" inputmode="numeric" aria-label="Last page" />
+            </span>
+          </label>
+        </fieldset>
+
+        <fieldset data-for="pdf">
+          <legend>Image quality</legend>
+          <label class="choice">
+            <input type="radio" name="quality" value="full" checked />
+            <span>Full, best for zooming and printing</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="quality" value="small" />
+            <span>Smaller file, easier to send</span>
+          </label>
+        </fieldset>
+
+        <fieldset data-for="md txt">
+          <legend>Options</legend>
+          <label class="choice">
+            <input type="checkbox" name="page-numbers" checked />
+            <span>Mark where each page starts</span>
+          </label>
+          <label class="choice">
+            <input type="checkbox" name="annotations" checked />
+            <span>Include my highlights and notes</span>
+          </label>
+        </fieldset>
+
+        <p class="export-summary" data-ref="summary"></p>
+      </form>
+      <div class="text-status">
+        <span data-ref="status" role="status"></span>
+        <progress data-ref="progress" max="1" hidden></progress>
+      </div>
+      <div class="text-tools">
+        <button type="button" class="button" data-action="share">Share</button>
+        <button type="button" class="button primary grow" data-action="download">Download</button>
+      </div>
+    </dialog>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
