@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "skills": {
+    "accessibility": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "github",
+      "skillPath": "skills/accessibility/SKILL.md",
+      "computedHash": "88c64dead9bb55925c7b983f5fd95cfecf30bd8c076fd384cdb17019d1becd87"
+    },
+    "capture-idea": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "f24d4a6b3343a1bfbe13fb3ac3719d41eba945e101cbda3cf9e0bd4bdd78c790"
+    },
+    "codebase-design": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/codebase-design/SKILL.md",
+      "computedHash": "fb1d8ab98ad151551eeade003e3ae55a46578a380fd9fc3ed4dbf9c2fbce0a9f"
+    },
+    "eval-skill": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "4133a9b2bbc734703d6d04786da05aaca42152b8ce78f287666e3e700e0b29b6"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "106acf230014cbb43ca34e6410371321b56ca742f9ee0442e8ec05bf02eb0384"
+    },
+    "grilling": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grilling/SKILL.md",
+      "computedHash": "c3b3e67f18495984385413bc6be7e2acbf2139c6cf52ef42abdda7242a791822"
+    },
+    "harden": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "a2f143608a4512244048ed4242aaebd266d67931cd6b728db003ef995da518d6"
+    },
+    "investigate": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "92c5ed9daae049b7dd33fbb909d047928771baad3885de10260b9efd0681ecec"
+    },
+    "onboard": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "3f18f14cfe09e713fd7c584dc3dc0d388516c55d5728b7ecbdc1c664b621233c"
+    },
+    "plan-architecture": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "18a9b1c548bae158b704ada9f68abd0fa1e1b707d0450056b6aacd97b9b221c0"
+    },
+    "review-against-prd": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "89dacc08abba305be73bc41d10e97e1377636a16bbf19b60e49d2c4eafc18703"
+    },
+    "run-pipeline": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "23c588a83bb83ada19d13a044f258018fbe52dc92e31535e916041e246c50f85"
+    },
+    "ship-report": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "88ce6ba3605c422656c04ad77435ed55c0e38800462a9f8e72539df761af80bf"
+    },
+    "tdd": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/tdd/SKILL.md",
+      "computedHash": "535d1a6f3bd5bded8971e7e4ea76538907cbff6b6d32c39cf97b669869dcd383"
+    },
+    "verify": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "59d8e1791921b16b69f36c083950df940c9db345a2266ce1bc983916eafc4329"
+    },
+    "write-prd": {
+      "source": "./pipeline",
+      "sourceType": "local",
+      "computedHash": "9d924054dcd7917abc8e3768b1aea141a55f1b87e48fbbc6821f07e238fdf0ac"
+    }
+  }
+}

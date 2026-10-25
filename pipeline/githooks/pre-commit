@@ -1,0 +1,4 @@
+#!/bin/sh
+# Regras duras antes de cada commit, para qualquer agente ou pessoa.
+# Ativado pelo setup do pipeline (git config core.hooksPath pipeline/githooks).
+exec npm --prefix pipeline run --silent precommit

@@ -1,4 +1,6 @@
+import './fonts.css';
 import { Camera, CameraUnavailable, normalizePhoto } from './camera';
+import { bookCloth } from './cloth';
 import * as db from './db';
 import { PageEditor, initialEdit } from './editor';
 import { ExportPanel } from './exportpanel';
@@ -160,8 +162,6 @@ backButton.addEventListener('click', () => {
 
 // ---- Library ----
 
-let coverUrls: string[] = [];
-
 async function openLibrary(): Promise<void> {
   book = null;
   pages = [];
@@ -202,38 +202,37 @@ async function openHit(hit: SearchHit): Promise<void> {
 
 async function renderLibrary(): Promise<void> {
   const books = await db.listBooks();
-  coverUrls.forEach((u) => URL.revokeObjectURL(u));
-  coverUrls = [];
-  const items = await Promise.all(
-    books.map(async (b) => {
-      const li = document.createElement('li');
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'book-card';
-      const cover = document.createElement('img');
-      cover.className = 'book-cover';
-      cover.alt = '';
-      const first = b.pageIds[0] !== undefined ? await db.getPage(b.pageIds[0]) : undefined;
-      if (first) {
-        const url = URL.createObjectURL(first.image);
-        coverUrls.push(url);
-        cover.src = url;
-      }
-      const info = document.createElement('span');
-      info.className = 'book-info';
-      const name = document.createElement('span');
-      name.className = 'book-title';
-      name.textContent = b.title;
-      const meta = document.createElement('span');
-      meta.className = 'book-meta';
-      meta.textContent = `${plural(b.pageIds.length, 'page')} · ${new Date(b.updatedAt).toLocaleDateString()}`;
-      info.append(name, meta);
-      button.append(cover, info);
-      button.addEventListener('click', () => void openBook(b));
-      li.append(button);
-      return li;
-    }),
-  );
+  const items = books.map((b) => {
+    const li = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'book-card';
+    // A cloth-bound cover with the title stamped in gilt; the cloth is fixed by the book id.
+    const cover = document.createElement('span');
+    cover.className = 'book-cover';
+    cover.dataset.cloth = bookCloth(b.id);
+    cover.setAttribute('aria-hidden', 'true');
+    const stamp = document.createElement('span');
+    stamp.className = 'book-stamp';
+    const stampText = document.createElement('span');
+    stampText.className = 'book-stamp-text';
+    stampText.textContent = b.title;
+    stamp.append(stampText);
+    cover.append(stamp);
+    const info = document.createElement('span');
+    info.className = 'book-info';
+    const name = document.createElement('span');
+    name.className = 'book-title';
+    name.textContent = b.title;
+    const meta = document.createElement('span');
+    meta.className = 'book-meta';
+    meta.textContent = `${plural(b.pageIds.length, 'page')}, ${new Date(b.updatedAt).toLocaleDateString()}`;
+    info.append(name, meta);
+    button.append(cover, info);
+    button.addEventListener('click', () => void openBook(b));
+    li.append(button);
+    return li;
+  });
   if (view !== 'library') return;
   bookList.replaceChildren(...items);
   libraryEmpty.hidden = books.length > 0;

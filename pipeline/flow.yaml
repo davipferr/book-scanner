@@ -1,0 +1,107 @@
+# O FLUXO. Este arquivo é a única fonte da ordem das etapas.
+#
+# Cada etapa diz:
+#   id          identificador único (kebab-case)
+#   title       nome para humanos
+#   skill       nome da skill que faz o trabalho (o `name:` do SKILL.md)
+#   source      "local" (pasta pipeline/skills/) ou "owner/repo" do GitHub/skills.sh,
+#               que precisa estar listado no pipeline/skills.json
+#   inputs      arquivos que a etapa lê (cada um tem que ser saída de uma etapa ANTERIOR)
+#   outputs     arquivos que a etapa grava, sempre em docs/flow/ (cada arquivo tem um
+#               único dono). São produto da execução: nunca ficam dentro de pipeline/
+#   interactive true se a etapa precisa de respostas do usuário
+#   adapter     (opcional) instruções extras para encaixar uma skill externa,
+#               que não conhece os arquivos deste projeto (fica em pipeline/adapters/)
+#   on_reject   (opcional) a etapa dá um veredito: o artefato precisa ter a linha
+#               "**Veredito:** aprovado" ou "**Veredito:** reprovado". Se reprovar,
+#               o status trava as etapas seguintes e manda refazer a etapa com este id
+#               (uma etapa anterior)
+#
+# Todos os caminhos são a partir da raiz do repositório.
+# O status também confere o cabeçalho de cada artefato (step, skill e inputs
+# iguais aos daqui); fora do contrato, a etapa fica "inválida".
+#
+# `helpers` lista skills locais de APOIO: não são etapas (não têm ordem nem
+# artefato próprio), mas são chamadas por etapas ou direto pelo usuário.
+#
+# Depois de editar: `npm --prefix pipeline run validate` e
+# `npm --prefix pipeline run diagram -- --write`.
+
+name: ideia-ate-feature
+description: Leva uma ideia solta até uma feature implementada com testes, verificada como usuário, revisada e documentada.
+
+# Onde fica o código do projeto (o produto), a partir da raiz do repositório.
+# Projeto novo: `workspace` (o archive a guarda junto com a execução).
+# Projeto que já existia: `.` (o código do próprio repositório; o archive não mexe nele).
+code: .
+
+helpers:
+  - investigate   # reproduzir e ler o código antes de afirmar a causa de um problema
+  - harden        # transformar o trabalho manual das execuções em regras duras
+  - eval-skill    # testar uma skill com casos e nota, como teste unitário
+  - onboard       # projeto que já existia: mapa do código (docs/FEATURE-MAP.md) e skills da stack, antes da 1ª execução
+
+steps:
+  - id: idea
+    title: Capturar a ideia
+    skill: capture-idea
+    source: local
+    inputs: []
+    outputs: [docs/flow/01-ideia.md]
+    interactive: true
+
+  - id: grill
+    title: Interrogatório
+    skill: grilling
+    source: mattpocock/skills
+    inputs: [docs/flow/01-ideia.md]
+    outputs: [docs/flow/02-decisoes.md]
+    interactive: true
+    adapter: pipeline/adapters/grilling.md
+
+  - id: prd
+    title: PRD
+    skill: write-prd
+    source: local
+    inputs: [docs/flow/01-ideia.md, docs/flow/02-decisoes.md]
+    outputs: [docs/flow/03-prd.md]
+
+  - id: architecture
+    title: Arquitetura e fatias
+    skill: plan-architecture
+    source: local
+    inputs: [docs/flow/03-prd.md]
+    outputs: [docs/flow/04-arquitetura.md]
+
+  - id: implement
+    title: Implementação com TDD
+    skill: tdd
+    source: mattpocock/skills
+    inputs: [docs/flow/03-prd.md, docs/flow/04-arquitetura.md]
+    outputs: [docs/flow/05-implementacao.md]
+    interactive: true
+    adapter: pipeline/adapters/tdd.md
+
+  - id: verify
+    title: Verificação como usuário
+    skill: verify
+    source: local
+    inputs: [docs/flow/03-prd.md, docs/flow/04-arquitetura.md, docs/flow/05-implementacao.md]
+    outputs: [docs/flow/06-verificacao.md]
+    on_reject: implement
+
+  - id: review
+    title: Revisão contra o PRD
+    skill: review-against-prd
+    source: local
+    inputs: [docs/flow/03-prd.md, docs/flow/04-arquitetura.md, docs/flow/05-implementacao.md, docs/flow/06-verificacao.md]
+    outputs: [docs/flow/07-revisao.md]
+    on_reject: implement
+
+  - id: ship
+    title: Relatório de entrega
+    skill: ship-report
+    source: local
+    inputs: [docs/flow/03-prd.md, docs/flow/06-verificacao.md, docs/flow/07-revisao.md]
+    outputs: [docs/flow/08-entrega.md]
+    interactive: true

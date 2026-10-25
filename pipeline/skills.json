@@ -1,0 +1,39 @@
+{
+  "$comment": "Skills externas (do skills.sh / GitHub) que o pipeline usa. `npm --prefix pipeline run setup` instala tudo isto + as skills locais de pipeline/skills/ para cada agente em `agents`, na raiz do repositório.",
+  "agents": [
+    "claude-code",
+    "codex"
+  ],
+  "external": [
+    {
+      "source": "mattpocock/skills",
+      "skills": [
+        "grilling",
+        "tdd",
+        "codebase-design"
+      ],
+      "why": "grilling: interrogatório da ideia. tdd: implementação em fatias vermelho→verde. codebase-design: vocabulário que o tdd consulta."
+    },
+    {
+      "source": "vercel-labs/skills",
+      "skills": [
+        "find-skills"
+      ],
+      "why": "find-skills: a skill onboard a usa para achar no skills.sh as skills que servem para a stack de cada projeto."
+    },
+    {
+      "source": "anthropics/skills",
+      "skills": [
+        "frontend-design"
+      ],
+      "why": "frontend-design: direção visual, tipografia e layout com identidade própria para a interface do app (index.html, src/style.css)."
+    },
+    {
+      "source": "addyosmani/web-quality-skills",
+      "skills": [
+        "accessibility"
+      ],
+      "why": "accessibility: auditoria WCAG 2.2 da interface mobile (diálogos, abas, câmera, leitor)."
+    }
+  ]
+}
